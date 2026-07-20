@@ -4,7 +4,6 @@ import com.hansbraga.testetecnico.calculator.domain.CalculatorEngine
 import com.hansbraga.testetecnico.calculator.domain.CalculatorError
 import com.hansbraga.testetecnico.calculator.domain.CalculatorOperation
 import com.hansbraga.testetecnico.calculator.domain.CalculatorResult
-import kotlin.math.abs
 
 private const val MAX_DISPLAY_LENGTH = 15
 
@@ -14,7 +13,7 @@ private const val MAX_DISPLAY_LENGTH = 15
  */
 class CalculatorReducer(private val engine: CalculatorEngine) {
 
-    fun reduce(state: CalculatorState, intent: CalculatorIntent): CalculatorState {
+    fun reduce(state: CalculatorState, intent: CalculatorIntent.ArithmeticIntent): CalculatorState {
         if (state.isError && intent != CalculatorIntent.ClearPressed) {
             return state
         }
@@ -53,7 +52,7 @@ class CalculatorReducer(private val engine: CalculatorEngine) {
             val first = state.storedOperand ?: second
             return when (val result = engine.evaluate(first, second, state.pendingOperation)) {
                 is CalculatorResult.Success -> state.copy(
-                    display = formatResult(result.value),
+                    display = formatOperand(result.value),
                     storedOperand = result.value,
                     pendingOperation = operation,
                     shouldResetDisplay = true
@@ -72,7 +71,7 @@ class CalculatorReducer(private val engine: CalculatorEngine) {
         val first = state.storedOperand ?: second
         return when (val result = engine.evaluate(first, second, operation)) {
             is CalculatorResult.Success -> CalculatorState(
-                display = formatResult(result.value),
+                display = formatOperand(result.value),
                 shouldResetDisplay = true
             )
 
@@ -82,7 +81,7 @@ class CalculatorReducer(private val engine: CalculatorEngine) {
 
     private fun applyPercent(state: CalculatorState): CalculatorState {
         val value = state.display.toDouble() / 100.0
-        return state.copy(display = formatResult(value), shouldResetDisplay = true)
+        return state.copy(display = formatOperand(value), shouldResetDisplay = true)
     }
 
     private fun applyToggleSign(state: CalculatorState): CalculatorState {
@@ -100,13 +99,5 @@ class CalculatorReducer(private val engine: CalculatorEngine) {
             CalculatorError.DIVISION_BY_ZERO -> "Erro"
         }
         return CalculatorState(display = message, isError = true)
-    }
-
-    private fun formatResult(value: Double): String {
-        return if (value == value.toLong().toDouble() && abs(value) < 1e15) {
-            value.toLong().toString()
-        } else {
-            value.toString()
-        }
     }
 }

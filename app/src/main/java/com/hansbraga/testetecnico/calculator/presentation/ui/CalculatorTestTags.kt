@@ -9,7 +9,11 @@ object CalculatorTestTags {
     const val CLEAR_BUTTON = "calculator_clear"
     const val TOGGLE_SIGN_BUTTON = "calculator_toggle_sign"
     const val PERCENT_BUTTON = "calculator_percent"
+    const val HISTORY_LIST = "calculator_history_list"
+    const val HISTORY_CLEAR_BUTTON = "calculator_history_clear"
 
     fun digitButton(digit: Int) = "calculator_digit_$digit"
     fun operationButton(operation: CalculatorOperation) = "calculator_operation_${operation.name}"
+    fun historyItem(id: Long) = "calculator_history_item_$id"
+    fun historyItemDelete(id: Long) = "calculator_history_delete_$id"
 }

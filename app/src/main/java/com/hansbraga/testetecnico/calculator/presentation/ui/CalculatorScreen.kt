@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.hansbraga.testetecnico.calculator.domain.CalculatorOperation
+import com.hansbraga.testetecnico.calculator.domain.HistoryItem
 import com.hansbraga.testetecnico.calculator.presentation.mvi.CalculatorIntent
 import com.hansbraga.testetecnico.calculator.presentation.mvi.CalculatorState
 import com.hansbraga.testetecnico.calculator.presentation.mvi.CalculatorViewModel
@@ -33,11 +34,16 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun CalculatorScreen(viewModel: CalculatorViewModel = koinViewModel()) {
     val state by viewModel.state.collectAsStateWithLifecycle()
-    CalculatorScreenContent(state = state, onIntent = viewModel::onIntent)
+    val history by viewModel.historyState.collectAsStateWithLifecycle()
+    CalculatorScreenContent(state = state, history = history, onIntent = viewModel::onIntent)
 }
 
 @Composable
-fun CalculatorScreenContent(state: CalculatorState, onIntent: (CalculatorIntent) -> Unit) {
+fun CalculatorScreenContent(
+    state: CalculatorState,
+    history: List<HistoryItem>,
+    onIntent: (CalculatorIntent) -> Unit
+) {
     Column(modifier = Modifier.fillMaxSize()) {
         Box(
             modifier = Modifier
@@ -54,6 +60,15 @@ fun CalculatorScreenContent(state: CalculatorState, onIntent: (CalculatorIntent)
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 color = if (state.isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onBackground
+            )
+        }
+
+        if (history.isNotEmpty()) {
+            CalculatorHistorySection(
+                history = history,
+                onItemSelected = { id -> onIntent(CalculatorIntent.HistoryItemSelected(id)) },
+                onItemDeleted = { id -> onIntent(CalculatorIntent.DeleteHistoryItem(id)) },
+                onClearAll = { onIntent(CalculatorIntent.ClearHistoryPressed) }
             )
         }
 
