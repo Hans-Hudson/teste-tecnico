@@ -56,7 +56,6 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
-    implementation(libs.androidx.navigation.compose)
 
     implementation(platform(libs.compose.bom))
     androidTestImplementation(platform(libs.compose.bom))
@@ -77,6 +76,8 @@ dependencies {
     testImplementation(libs.androidx.room.testing)
     testImplementation(libs.koin.test)
     testImplementation(libs.koin.test.junit4)
+    testImplementation(libs.robolectric)
+    testImplementation(libs.androidx.test.ext.junit)
 
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.androidx.test.espresso.core)
