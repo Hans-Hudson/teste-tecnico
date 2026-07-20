@@ -11,7 +11,7 @@ interface CalculatorHistoryDao {
     @Insert
     suspend fun insert(entity: CalculatorHistoryEntity)
 
-    @Query("SELECT * FROM calculator_history ORDER BY timestamp DESC")
+    @Query("SELECT * FROM calculator_history ORDER BY timestamp ASC")
     fun observeAll(): Flow<List<CalculatorHistoryEntity>>
 
     @Query("DELETE FROM calculator_history WHERE id = :id")

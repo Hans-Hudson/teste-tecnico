@@ -9,10 +9,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
@@ -43,7 +45,14 @@ fun CalculatorHistorySection(
                 Text("Limpar")
             }
         }
+        val listState = rememberLazyListState()
+        LaunchedEffect(history.size) {
+            if (history.isNotEmpty()) {
+                listState.animateScrollToItem(history.lastIndex)
+            }
+        }
         LazyColumn(
+            state = listState,
             modifier = Modifier
                 .fillMaxWidth()
                 .height(150.dp)

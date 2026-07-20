@@ -45,14 +45,14 @@ class CalculatorHistoryDaoTest {
     }
 
     @Test
-    fun `observeAll orders entries by timestamp descending`() = runTest {
+    fun `observeAll orders entries by timestamp ascending`() = runTest {
         dao.insert(CalculatorHistoryEntity(expression = "1 + 1", result = "2", timestamp = 1L))
         dao.insert(CalculatorHistoryEntity(expression = "2 + 2", result = "4", timestamp = 2L))
 
         dao.observeAll().test {
             val history = awaitItem()
-            assertEquals("2 + 2", history[0].expression)
-            assertEquals("1 + 1", history[1].expression)
+            assertEquals("1 + 1", history[0].expression)
+            assertEquals("2 + 2", history[1].expression)
         }
     }
 
