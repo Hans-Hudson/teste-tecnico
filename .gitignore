@@ -1,0 +1,20 @@
+*.iml
+.claude/
+.gradle/
+/local.properties
+.idea/
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+local.properties
+
+# Android Studio / IntelliJ generated caches and settings
+*.log
+.navigation/
+/app/build
+/app/release
+
+# Gradle
+!gradle/wrapper/gradle-wrapper.jar
