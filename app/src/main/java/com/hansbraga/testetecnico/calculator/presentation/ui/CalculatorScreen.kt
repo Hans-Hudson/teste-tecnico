@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
@@ -44,7 +45,20 @@ fun CalculatorScreenContent(
     history: List<HistoryItem>,
     onIntent: (CalculatorIntent) -> Unit
 ) {
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .safeDrawingPadding()
+    ) {
+        if (history.isNotEmpty()) {
+            CalculatorHistorySection(
+                history = history,
+                onItemSelected = { id -> onIntent(CalculatorIntent.HistoryItemSelected(id)) },
+                onItemDeleted = { id -> onIntent(CalculatorIntent.DeleteHistoryItem(id)) },
+                onClearAll = { onIntent(CalculatorIntent.ClearHistoryPressed) }
+            )
+        }
+
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -60,15 +74,6 @@ fun CalculatorScreenContent(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis,
                 color = if (state.isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onBackground
-            )
-        }
-
-        if (history.isNotEmpty()) {
-            CalculatorHistorySection(
-                history = history,
-                onItemSelected = { id -> onIntent(CalculatorIntent.HistoryItemSelected(id)) },
-                onItemDeleted = { id -> onIntent(CalculatorIntent.DeleteHistoryItem(id)) },
-                onClearAll = { onIntent(CalculatorIntent.ClearHistoryPressed) }
             )
         }
 
