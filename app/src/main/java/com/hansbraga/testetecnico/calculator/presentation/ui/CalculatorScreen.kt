@@ -54,14 +54,12 @@ fun CalculatorScreenContent(
             .fillMaxSize()
             .safeDrawingPadding()
     ) {
-        if (history.isNotEmpty()) {
-            CalculatorHistorySection(
-                history = history,
-                onItemSelected = { id -> onIntent(CalculatorIntent.HistoryItemSelected(id)) },
-                onItemDeleted = { id -> onIntent(CalculatorIntent.DeleteHistoryItem(id)) },
-                onClearAll = { onIntent(CalculatorIntent.ClearHistoryPressed) }
-            )
-        }
+        CalculatorHistorySection(
+            history = history,
+            onItemSelected = { id -> onIntent(CalculatorIntent.HistoryItemSelected(id)) },
+            onItemDeleted = { id -> onIntent(CalculatorIntent.DeleteHistoryItem(id)) },
+            onClearAll = { onIntent(CalculatorIntent.ClearHistoryPressed) }
+        )
 
         Box(
             modifier = Modifier
