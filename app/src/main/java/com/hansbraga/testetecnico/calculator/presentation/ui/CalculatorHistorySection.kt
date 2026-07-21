@@ -17,9 +17,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.hideFromAccessibility
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.hansbraga.testetecnico.calculator.domain.HistoryItem
@@ -32,11 +34,17 @@ fun CalculatorHistorySection(
     onClearAll: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val isHistoryEmpty = history.isEmpty()
+
     Column(modifier = modifier) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 12.dp, vertical = 4.dp),
+                .padding(horizontal = 12.dp, vertical = 4.dp)
+                .alpha(if (isHistoryEmpty) 0f else 1f)
+                .then(
+                    if (isHistoryEmpty) Modifier.semantics { hideFromAccessibility() } else Modifier
+                ),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -47,6 +55,7 @@ fun CalculatorHistorySection(
             )
             TextButton(
                 onClick = onClearAll,
+                enabled = !isHistoryEmpty,
                 modifier = Modifier
                     .testTag(CalculatorTestTags.HISTORY_CLEAR_BUTTON)
                     .semantics { contentDescription = "Limpar histórico" }
