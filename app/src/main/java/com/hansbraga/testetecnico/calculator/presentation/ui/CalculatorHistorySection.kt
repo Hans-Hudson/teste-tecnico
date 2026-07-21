@@ -18,6 +18,9 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.heading
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import com.hansbraga.testetecnico.calculator.domain.HistoryItem
 
@@ -37,10 +40,16 @@ fun CalculatorHistorySection(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(text = "Histórico", style = MaterialTheme.typography.labelLarge)
+            Text(
+                text = "Histórico",
+                style = MaterialTheme.typography.labelLarge,
+                modifier = Modifier.semantics { heading() }
+            )
             TextButton(
                 onClick = onClearAll,
-                modifier = Modifier.testTag(CalculatorTestTags.HISTORY_CLEAR_BUTTON)
+                modifier = Modifier
+                    .testTag(CalculatorTestTags.HISTORY_CLEAR_BUTTON)
+                    .semantics { contentDescription = "Limpar histórico" }
             ) {
                 Text("Limpar")
             }
@@ -72,6 +81,9 @@ private fun HistoryRow(item: HistoryItem, onSelected: (Long) -> Unit, onDeleted:
             .fillMaxWidth()
             .clickable { onSelected(item.id) }
             .testTag(CalculatorTestTags.historyItem(item.id))
+            .semantics {
+                contentDescription = "Reutilizar cálculo: ${item.expression} igual a ${item.result}"
+            }
             .padding(horizontal = 12.dp, vertical = 8.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
@@ -82,7 +94,11 @@ private fun HistoryRow(item: HistoryItem, onSelected: (Long) -> Unit, onDeleted:
         }
         TextButton(
             onClick = { onDeleted(item.id) },
-            modifier = Modifier.testTag(CalculatorTestTags.historyItemDelete(item.id))
+            modifier = Modifier
+                .testTag(CalculatorTestTags.historyItemDelete(item.id))
+                .semantics {
+                    contentDescription = "Apagar cálculo ${item.expression} igual a ${item.result} do histórico"
+                }
         ) {
             Text("✕")
         }

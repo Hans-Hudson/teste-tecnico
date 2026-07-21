@@ -20,6 +20,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -68,7 +72,16 @@ fun CalculatorScreenContent(
         ) {
             Text(
                 text = state.display,
-                modifier = Modifier.testTag(CalculatorTestTags.DISPLAY),
+                modifier = Modifier
+                    .testTag(CalculatorTestTags.DISPLAY)
+                    .semantics {
+                        liveRegion = LiveRegionMode.Polite
+                        contentDescription = if (state.isError) {
+                            state.display
+                        } else {
+                            "Resultado: ${state.display}"
+                        }
+                    },
                 fontSize = 56.sp,
                 textAlign = TextAlign.End,
                 maxLines = 1,
@@ -120,9 +133,10 @@ private fun RowScope.CalculatorButton(
     weight: Float,
     onIntent: (CalculatorIntent) -> Unit
 ) {
-    val (label, tag, intent, colors) = when (spec) {
+    val (label, description, tag, intent, colors) = when (spec) {
         is ButtonSpec.Digit -> ButtonPresentation(
             label = spec.digit.toString(),
+            description = null,
             tag = CalculatorTestTags.digitButton(spec.digit),
             intent = CalculatorIntent.DigitPressed(spec.digit),
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
@@ -130,6 +144,7 @@ private fun RowScope.CalculatorButton(
 
         is ButtonSpec.Operation -> ButtonPresentation(
             label = spec.operation.symbol,
+            description = spec.operation.accessibilityLabel,
             tag = CalculatorTestTags.operationButton(spec.operation),
             intent = CalculatorIntent.OperationPressed(spec.operation),
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
@@ -137,6 +152,7 @@ private fun RowScope.CalculatorButton(
 
         ButtonSpec.Decimal -> ButtonPresentation(
             label = ".",
+            description = "Ponto decimal",
             tag = CalculatorTestTags.DECIMAL_BUTTON,
             intent = CalculatorIntent.DecimalPointPressed,
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
@@ -144,6 +160,7 @@ private fun RowScope.CalculatorButton(
 
         ButtonSpec.Equals -> ButtonPresentation(
             label = "=",
+            description = "Igual",
             tag = CalculatorTestTags.EQUALS_BUTTON,
             intent = CalculatorIntent.EqualsPressed,
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
@@ -151,6 +168,7 @@ private fun RowScope.CalculatorButton(
 
         ButtonSpec.Clear -> ButtonPresentation(
             label = "C",
+            description = "Limpar calculadora",
             tag = CalculatorTestTags.CLEAR_BUTTON,
             intent = CalculatorIntent.ClearPressed,
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
@@ -158,6 +176,7 @@ private fun RowScope.CalculatorButton(
 
         ButtonSpec.ToggleSign -> ButtonPresentation(
             label = "+/-",
+            description = "Alternar sinal",
             tag = CalculatorTestTags.TOGGLE_SIGN_BUTTON,
             intent = CalculatorIntent.ToggleSignPressed,
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
@@ -165,6 +184,7 @@ private fun RowScope.CalculatorButton(
 
         ButtonSpec.Percent -> ButtonPresentation(
             label = "%",
+            description = "Porcentagem",
             tag = CalculatorTestTags.PERCENT_BUTTON,
             intent = CalculatorIntent.PercentPressed,
             colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
@@ -178,6 +198,13 @@ private fun RowScope.CalculatorButton(
             .weight(weight)
             .aspectRatio(if (weight > 1f) 2f else 1f)
             .testTag(tag)
+            .then(
+                if (description != null) {
+                    Modifier.semantics { contentDescription = description }
+                } else {
+                    Modifier
+                }
+            )
     ) {
         Text(text = label, fontSize = 22.sp)
     }
@@ -185,6 +212,7 @@ private fun RowScope.CalculatorButton(
 
 private data class ButtonPresentation(
     val label: String,
+    val description: String?,
     val tag: String,
     val intent: CalculatorIntent,
     val colors: ButtonColors
