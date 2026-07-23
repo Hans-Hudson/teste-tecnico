@@ -43,6 +43,43 @@ item pode ser apagado individualmente, e há um botão para limpar todo o
 histórico. Novos cálculos são adicionados ao final da lista (mais recente
 embaixo), com rolagem automática para o último item.
 
+## Resolver expressão por foto (OpenAI)
+
+Um botão "Resolver por foto" na tela da calculadora leva a uma segunda tela
+onde o usuário pode fotografar ou selecionar da galeria uma imagem contendo
+uma expressão matemática. A imagem é enviada para a API da OpenAI
+(modelo `gpt-4o-mini`, o mais barato com suporte a visão, via `/v1/responses`
+com Structured Outputs), que resolve a expressão e retorna um JSON
+`{ hasExpression, expression, result }` — todo o processamento acontece na
+API; o app é só a ponte. Se a imagem não contiver uma expressão matemática
+(`hasExpression: false`), um erro é exibido ao usuário.
+
+Decisões técnicas:
+
+- **Captura de imagem** via `ActivityResultContracts.TakePicture()` (delega
+  para o app de câmera do sistema, usando um `FileProvider`) e
+  `ActivityResultContracts.PickVisualMedia()` (Android Photo Picker) — sem
+  Camera2/preview customizado e sem permissões de câmera/armazenamento em
+  tempo de execução, já que ambos os contratos delegam para componentes do
+  sistema.
+- **Retrofit + kotlinx.serialization** para a chamada HTTP; a imagem é
+  redimensionada/comprimida no cliente antes do envio (base64) para controlar
+  tamanho de payload e custo.
+- **MVI com um `suspend fun` no repositório** (não `Flow`) para a chamada de
+  rede, já que é uma operação única de request/resposta; o `ViewModel`
+  expõe um `PhotoSolverState` (`Idle` / `Loading` / `Success` / `Error`) via
+  `StateFlow` para a UI.
+- **Chave da API OpenAI**: lida de `local.properties` (arquivo local,
+  ignorado pelo Git) e exposta como `BuildConfig.OPENAI_API_KEY`, usada
+  apenas por um interceptor OkHttp que adiciona o header `Authorization`.
+  Para rodar essa funcionalidade localmente, adicione ao seu
+  `local.properties`:
+  ```
+  OPENAI_API_KEY=sk-sua-chave-aqui
+  ```
+  Sem essa entrada, a tela de resolver por foto compila e roda normalmente,
+  mas qualquer requisição à API falha com erro de autenticação.
+
 ## Estrutura do projeto
 
 ```
@@ -51,12 +88,18 @@ app/src/main/java/.../
 ├── MainActivity.kt
 ├── TesteTecnicoApp.kt          # Application, inicializa o Koin
 ├── core/theme/                 # tema Material3 (light/dark)
-└── calculator/
-    ├── domain/                 # regras de negócio puras (engine, modelos, repositório como interface)
-    ├── data/                   # Room (Entity, Dao, Database) e implementação do repositório
-    ├── presentation/mvi/       # State, Intent, Reducer (puro) e ViewModel
-    ├── presentation/ui/        # Composables (tela, seção de histórico, testTags)
-    └── di/                     # módulo Koin
+├── calculator/
+│   ├── domain/                 # regras de negócio puras (engine, modelos, repositório como interface)
+│   ├── data/                   # Room (Entity, Dao, Database) e implementação do repositório
+│   ├── presentation/mvi/       # State, Intent, Reducer (puro) e ViewModel
+│   ├── presentation/ui/        # Composables (tela, seção de histórico, testTags)
+│   └── di/                     # módulo Koin
+└── mathsolver/                 # resolver expressão por foto (OpenAI)
+    ├── domain/                 # MathSolverResult, MathSolverRepository (interface)
+    ├── data/                   # DTOs, Retrofit API, implementação do repositório
+    ├── presentation/mvi/       # State, Intent e ViewModel
+    ├── presentation/ui/        # Composables (tela, testTags, captura/seleção de imagem)
+    └── di/                     # módulo Koin (Retrofit/OkHttp/Json)
 ```
 
 ## Como rodar
@@ -70,19 +113,18 @@ Testes unitários cobrem a engine de cálculo, o reducer MVI (com MockK
 isolando a engine), o `ViewModel` (com Turbine + um fake repository) e o DAO
 do Room (com Robolectric + banco in-memory, sem precisar de emulador).
 
+Testes de UI Compose (`androidx.compose.ui.test`) cobrem a `CalculatorScreenContent`
+e a `PhotoSolverScreenContent` (disparo de intents por botão, renderização de
+estados normal/erro/carregando, e interações do histórico), também rodando
+sobre Robolectric via `testDebugUnitTest` em vez de instrumentados
+(`androidTest`), pelo mesmo motivo de não haver emulador configurado no
+ambiente de desenvolvimento.
+
+O repositório que fala com a API da OpenAI (`MathSolverRepositoryImpl`) é
+testado isolando a interface Retrofit com MockK, sem chamadas de rede reais.
+
 ## O que ficou incompleto / o que faria diferente com mais tempo
 
 - **Listagem de filmes**: não implementada — o tempo disponível foi
   direcionado inteiramente para a calculadora, conforme priorização definida
   no início do desenvolvimento.
-- **Testes de UI Compose** (`androidx.compose.ui.test`): a tela já foi
-  construída com `testTag` em todos os elementos interativos pensando nisso,
-  mas os testes em si não foram escritos — ficaram como prioridade secundária
-  frente aos testes unitários.
-- **Validação em dispositivo/emulador real**: o ambiente de desenvolvimento
-  usado não tinha um emulador Android configurado; a verificação foi feita via
-  testes automatizados e build bem-sucedido (`assembleDebug`), não por
-  inspeção visual direta do app rodando.
-- Com mais tempo, também revisitaria o versionamento de schema do Room
-  (atualmente `exportSchema = false`, aceitável para este escopo sem
-  migrations) e adicionaria testes de acessibilidade automatizados.
