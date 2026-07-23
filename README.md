@@ -3,14 +3,10 @@
 ## Contexto do problema
 
 A especificação do teste técnico pedia uma aplicação simples (ou parte de uma
-solução mais complexa, porém funcional), sugerindo alguns temas — entre eles,
-uma calculadora com histórico persistente local e uma listagem de filmes
-consumindo API.
+solução mais complexa, porém funcional).
 
-Optei por focar exclusivamente na **calculadora com histórico persistente**,
-priorizando profundidade (arquitetura, testes, acessibilidade, tratamento de
-erros) em vez de dividir o tempo disponível entre duas funcionalidades
-diferentes. A listagem de filmes **não foi implementada**.
+Optei por focar na **calculadora com histórico persistente**, priorizando
+profundidade (arquitetura, testes, acessibilidade, tratamento de erros).
 
 ## Solução proposta
 
