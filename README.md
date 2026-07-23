@@ -29,6 +29,15 @@ profundidade (arquitetura, testes, acessibilidade, tratamento de erros).
   (visual + acessibilidade) quando vazios, sem deslocar o layout.
 - Suporte a light/dark theme (Material 3) e a insets de tela (notch/câmera e
   barra de navegação por gestos) via `enableEdgeToEdge()` + `safeDrawingPadding()`.
+  Os papéis de cor (`primary`/`secondary`/`surfaceVariant`/... e seus pares
+  `on*`) são definidos explicitamente para os dois temas, e cada botão passa
+  `contentColor` pareado com seu `containerColor` — evita depender do padrão
+  genérico do Material3, que gerava baixo contraste em alguns botões no modo
+  escuro.
+- **Layout responsivo do grid de botões**: histórico, display e as linhas de
+  botões dividem o espaço vertical por peso (`Modifier.weight`) em vez de
+  alturas fixas, para não deixar o display sem espaço (altura zero) em telas
+  mais compactas.
 
 ### Comportamento da calculadora
 
@@ -118,3 +127,7 @@ ambiente de desenvolvimento.
 
 O repositório que fala com a API da OpenAI (`MathSolverRepositoryImpl`) é
 testado isolando a interface Retrofit com MockK, sem chamadas de rede reais.
+
+Dois testes travam a altura mínima do display da calculadora (com histórico
+cheio e vazio) sobre uma tela compacta (`w360dp-h640dp`) — reproduziram um
+bug real de layout (display colapsando para 0dp de altura) antes da correção.
