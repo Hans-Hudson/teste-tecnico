@@ -122,9 +122,3 @@ ambiente de desenvolvimento.
 
 O repositório que fala com a API da OpenAI (`MathSolverRepositoryImpl`) é
 testado isolando a interface Retrofit com MockK, sem chamadas de rede reais.
-
-## O que ficou incompleto / o que faria diferente com mais tempo
-
-- **Listagem de filmes**: não implementada — o tempo disponível foi
-  direcionado inteiramente para a calculadora, conforme priorização definida
-  no início do desenvolvimento.
