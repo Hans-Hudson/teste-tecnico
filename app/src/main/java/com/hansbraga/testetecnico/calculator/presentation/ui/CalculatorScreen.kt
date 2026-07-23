@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -84,13 +84,14 @@ fun CalculatorScreenContent(
             history = history,
             onItemSelected = { id -> onIntent(CalculatorIntent.HistoryItemSelected(id)) },
             onItemDeleted = { id -> onIntent(CalculatorIntent.DeleteHistoryItem(id)) },
-            onClearAll = { onIntent(CalculatorIntent.ClearHistoryPressed) }
+            onClearAll = { onIntent(CalculatorIntent.ClearHistoryPressed) },
+            modifier = Modifier.weight(2f)
         )
 
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .weight(1f)
+                .weight(1.5f)
                 .padding(24.dp),
             contentAlignment = Alignment.BottomEnd
         ) {
@@ -126,6 +127,7 @@ fun CalculatorScreenContent(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .weight(1f)
                     .padding(4.dp),
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
@@ -241,7 +243,7 @@ private fun RowScope.CalculatorButton(
         colors = colors,
         modifier = Modifier
             .weight(weight)
-            .aspectRatio(if (weight > 1f) 2f else 1f)
+            .fillMaxHeight()
             .testTag(tag)
             .then(
                 if (description != null) {

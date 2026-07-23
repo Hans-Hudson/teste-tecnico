@@ -5,7 +5,9 @@ import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.assertHeightIsAtLeast
 import androidx.compose.ui.test.performClick
+import androidx.compose.ui.unit.dp
 import com.hansbraga.testetecnico.calculator.domain.CalculatorOperation
 import com.hansbraga.testetecnico.calculator.domain.HistoryItem
 import com.hansbraga.testetecnico.calculator.presentation.mvi.CalculatorIntent
@@ -169,6 +171,23 @@ class CalculatorScreenContentTest {
         composeTestRule.onNodeWithTag(CalculatorTestTags.HISTORY_CLEAR_BUTTON).performClick()
 
         assertEquals(listOf(CalculatorIntent.ClearHistoryPressed), recordedIntents)
+    }
+
+    @Test
+    fun `display stays visible even with a full history list`() {
+        val fullHistory = (1..20L).map {
+            HistoryItem(id = it, expression = "$it + $it", result = "${it * 2}", timestamp = it)
+        }
+        setContent(state = CalculatorState(display = "123"), history = fullHistory)
+
+        composeTestRule.onNodeWithTag(CalculatorTestTags.DISPLAY).assertHeightIsAtLeast(1.dp)
+    }
+
+    @Test
+    fun `display stays visible with an empty history`() {
+        setContent(state = CalculatorState(display = "123"), history = emptyList())
+
+        composeTestRule.onNodeWithTag(CalculatorTestTags.DISPLAY).assertHeightIsAtLeast(1.dp)
     }
 
     @Test
