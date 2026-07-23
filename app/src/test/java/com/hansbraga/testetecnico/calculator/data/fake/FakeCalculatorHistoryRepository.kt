@@ -16,7 +16,7 @@ class FakeCalculatorHistoryRepository : CalculatorHistoryRepository {
     override suspend fun insert(expression: String, result: String) {
         val item = HistoryItem(id = nextId, expression = expression, result = result, timestamp = nextId)
         nextId++
-        items.value = items.value + item
+        items.value += item
     }
 
     override suspend fun delete(id: Long) {
