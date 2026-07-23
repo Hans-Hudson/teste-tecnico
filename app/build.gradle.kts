@@ -4,10 +4,19 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
 }
 
 val buildConfigProps = rootProject.extra["buildConfig"] as Properties
+
+val localProps = Properties().apply {
+    val localPropertiesFile = rootProject.file("local.properties")
+    if (localPropertiesFile.exists()) {
+        localPropertiesFile.inputStream().use { load(it) }
+    }
+}
+val openAiApiKey: String = localProps.getProperty("OPENAI_API_KEY", "")
 
 android {
     namespace = buildConfigProps.getProperty("applicationId")
@@ -21,6 +30,8 @@ android {
         versionName = buildConfigProps.getProperty("versionName")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        buildConfigField("String", "OPENAI_API_KEY", "\"$openAiApiKey\"")
     }
 
     buildTypes {
@@ -43,6 +54,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     packaging {
@@ -77,6 +89,8 @@ dependencies {
     implementation(libs.koin.androidx.compose)
 
     implementation(libs.kotlinx.coroutines.android)
+
+    implementation(libs.bundles.network)
 
     testImplementation(libs.bundles.unit.test)
     testImplementation(libs.androidx.room.testing)
