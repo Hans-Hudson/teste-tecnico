@@ -10,6 +10,7 @@ import org.junit.Assert.assertTrue
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.koin.core.context.stopKoin
 import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
@@ -30,6 +31,7 @@ class CalculatorHistoryDaoTest {
     @After
     fun tearDown() {
         database.close()
+        stopKoin()
     }
 
     @Test
