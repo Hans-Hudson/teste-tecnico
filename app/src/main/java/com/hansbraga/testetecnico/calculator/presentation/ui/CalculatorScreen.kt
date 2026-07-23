@@ -163,7 +163,10 @@ private fun RowScope.CalculatorButton(
             description = null,
             tag = CalculatorTestTags.digitButton(spec.digit),
             intent = CalculatorIntent.DigitPressed(spec.digit),
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         )
 
         is ButtonSpec.Operation -> ButtonPresentation(
@@ -171,7 +174,10 @@ private fun RowScope.CalculatorButton(
             description = spec.operation.accessibilityLabel,
             tag = CalculatorTestTags.operationButton(spec.operation),
             intent = CalculatorIntent.OperationPressed(spec.operation),
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            )
         )
 
         ButtonSpec.Decimal -> ButtonPresentation(
@@ -179,7 +185,10 @@ private fun RowScope.CalculatorButton(
             description = "Ponto decimal",
             tag = CalculatorTestTags.DECIMAL_BUTTON,
             intent = CalculatorIntent.DecimalPointPressed,
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         )
 
         ButtonSpec.Equals -> ButtonPresentation(
@@ -187,7 +196,10 @@ private fun RowScope.CalculatorButton(
             description = "Igual",
             tag = CalculatorTestTags.EQUALS_BUTTON,
             intent = CalculatorIntent.EqualsPressed,
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            )
         )
 
         ButtonSpec.Clear -> ButtonPresentation(
@@ -195,7 +207,10 @@ private fun RowScope.CalculatorButton(
             description = "Limpar calculadora",
             tag = CalculatorTestTags.CLEAR_BUTTON,
             intent = CalculatorIntent.ClearPressed,
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.secondary,
+                contentColor = MaterialTheme.colorScheme.onSecondary
+            )
         )
 
         ButtonSpec.ToggleSign -> ButtonPresentation(
@@ -203,7 +218,10 @@ private fun RowScope.CalculatorButton(
             description = "Alternar sinal",
             tag = CalculatorTestTags.TOGGLE_SIGN_BUTTON,
             intent = CalculatorIntent.ToggleSignPressed,
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.secondary,
+                contentColor = MaterialTheme.colorScheme.onSecondary
+            )
         )
 
         ButtonSpec.Percent -> ButtonPresentation(
@@ -211,7 +229,10 @@ private fun RowScope.CalculatorButton(
             description = "Porcentagem",
             tag = CalculatorTestTags.PERCENT_BUTTON,
             intent = CalculatorIntent.PercentPressed,
-            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.secondary,
+                contentColor = MaterialTheme.colorScheme.onSecondary
+            )
         )
     }
 
