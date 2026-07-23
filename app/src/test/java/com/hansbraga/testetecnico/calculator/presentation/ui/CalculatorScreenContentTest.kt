@@ -28,6 +28,7 @@ class CalculatorScreenContentTest {
     val composeTestRule = createComposeRule()
 
     private val recordedIntents = mutableListOf<CalculatorIntent>()
+    private var openPhotoSolverCalls = 0
 
     @After
     fun tearDown() {
@@ -43,7 +44,8 @@ class CalculatorScreenContentTest {
                 CalculatorScreenContent(
                     state = state,
                     history = history,
-                    onIntent = { recordedIntents.add(it) }
+                    onIntent = { recordedIntents.add(it) },
+                    onOpenPhotoSolver = { openPhotoSolverCalls++ }
                 )
             }
         }
@@ -167,5 +169,14 @@ class CalculatorScreenContentTest {
         composeTestRule.onNodeWithTag(CalculatorTestTags.HISTORY_CLEAR_BUTTON).performClick()
 
         assertEquals(listOf(CalculatorIntent.ClearHistoryPressed), recordedIntents)
+    }
+
+    @Test
+    fun `tapping the photo solver button triggers onOpenPhotoSolver`() {
+        setContent()
+
+        composeTestRule.onNodeWithTag(CalculatorTestTags.OPEN_PHOTO_SOLVER_BUTTON).performClick()
+
+        assertEquals(1, openPhotoSolverCalls)
     }
 }

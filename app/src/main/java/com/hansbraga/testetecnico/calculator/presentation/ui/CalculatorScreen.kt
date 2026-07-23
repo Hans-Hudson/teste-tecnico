@@ -15,6 +15,7 @@ import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -37,23 +38,48 @@ import com.hansbraga.testetecnico.calculator.presentation.mvi.CalculatorViewMode
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun CalculatorScreen(viewModel: CalculatorViewModel = koinViewModel()) {
+fun CalculatorScreen(
+    onOpenPhotoSolver: () -> Unit,
+    viewModel: CalculatorViewModel = koinViewModel()
+) {
     val state by viewModel.state.collectAsStateWithLifecycle()
     val history by viewModel.historyState.collectAsStateWithLifecycle()
-    CalculatorScreenContent(state = state, history = history, onIntent = viewModel::onIntent)
+    CalculatorScreenContent(
+        state = state,
+        history = history,
+        onIntent = viewModel::onIntent,
+        onOpenPhotoSolver = onOpenPhotoSolver
+    )
 }
 
 @Composable
 fun CalculatorScreenContent(
     state: CalculatorState,
     history: List<HistoryItem>,
-    onIntent: (CalculatorIntent) -> Unit
+    onIntent: (CalculatorIntent) -> Unit,
+    onOpenPhotoSolver: () -> Unit
 ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .safeDrawingPadding()
     ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp, vertical = 4.dp),
+            horizontalArrangement = Arrangement.End
+        ) {
+            TextButton(
+                onClick = onOpenPhotoSolver,
+                modifier = Modifier
+                    .testTag(CalculatorTestTags.OPEN_PHOTO_SOLVER_BUTTON)
+                    .semantics { contentDescription = "Resolver expressão por foto" }
+            ) {
+                Text("Resolver por foto")
+            }
+        }
+
         CalculatorHistorySection(
             history = history,
             onItemSelected = { id -> onIntent(CalculatorIntent.HistoryItemSelected(id)) },

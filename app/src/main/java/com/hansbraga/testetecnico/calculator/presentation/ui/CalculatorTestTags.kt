@@ -11,6 +11,7 @@ object CalculatorTestTags {
     const val PERCENT_BUTTON = "calculator_percent"
     const val HISTORY_LIST = "calculator_history_list"
     const val HISTORY_CLEAR_BUTTON = "calculator_history_clear"
+    const val OPEN_PHOTO_SOLVER_BUTTON = "calculator_open_photo_solver"
 
     fun digitButton(digit: Int) = "calculator_digit_$digit"
     fun operationButton(operation: CalculatorOperation) = "calculator_operation_${operation.name}"
