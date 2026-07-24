@@ -123,4 +123,38 @@ class CalculatorReducerTest {
 
         assertEquals("0.5", state.display)
     }
+
+    @Test
+    fun `expression in progress combines stored operand, operation symbol and current display`() {
+        val state = CalculatorState(display = "3", storedOperand = 2.0, pendingOperation = CalculatorOperation.ADD)
+
+        val expression = reducer.expressionInProgress(state)
+
+        assertEquals("2 + 3", expression)
+    }
+
+    @Test
+    fun `expression in progress is null when there is no pending operation`() {
+        val state = CalculatorState(display = "3", storedOperand = 2.0, pendingOperation = null)
+
+        val expression = reducer.expressionInProgress(state)
+
+        assertEquals(null, expression)
+    }
+
+    @Test
+    fun `expression in progress is null when there is no stored operand`() {
+        val state = CalculatorState(display = "3", storedOperand = null, pendingOperation = CalculatorOperation.ADD)
+
+        val expression = reducer.expressionInProgress(state)
+
+        assertEquals(null, expression)
+    }
+
+    @Test
+    fun `history selection returns a fresh state pointing at the selected result`() {
+        val state = reducer.applyHistorySelection("42")
+
+        assertEquals(CalculatorState(display = "42", shouldResetDisplay = true), state)
+    }
 }

@@ -41,7 +41,7 @@ class CalculatorViewModel(
         val next = reducer.reduce(previous, CalculatorIntent.EqualsPressed)
         _state.value = next
 
-        val expression = buildExpression(previous)
+        val expression = reducer.expressionInProgress(previous)
         if (!next.isError && expression != null) {
             viewModelScope.launch {
                 historyRepository.insert(expression = expression, result = next.display)
@@ -51,12 +51,6 @@ class CalculatorViewModel(
 
     private fun selectHistoryItem(id: Long) {
         val item = historyState.value.firstOrNull { it.id == id } ?: return
-        _state.value = CalculatorState(display = item.result, shouldResetDisplay = true)
-    }
-
-    private fun buildExpression(state: CalculatorState): String? {
-        val operation = state.pendingOperation ?: return null
-        val operand = state.storedOperand ?: return null
-        return "${formatOperand(operand)} ${operation.symbol} ${state.display}"
+        _state.value = reducer.applyHistorySelection(item.result)
     }
 }

@@ -100,4 +100,13 @@ class CalculatorReducer(private val engine: CalculatorEngine) {
         }
         return CalculatorState(display = message, isError = true)
     }
+
+    fun expressionInProgress(state: CalculatorState): String? {
+        val operation = state.pendingOperation ?: return null
+        val operand = state.storedOperand ?: return null
+        return "${formatOperand(operand)} ${operation.symbol} ${state.display}"
+    }
+
+    fun applyHistorySelection(result: String): CalculatorState =
+        CalculatorState(display = result, shouldResetDisplay = true)
 }
