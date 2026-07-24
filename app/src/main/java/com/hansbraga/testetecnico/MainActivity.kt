@@ -9,7 +9,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import com.hansbraga.testetecnico.calculator.presentation.ui.CalculatorScreen
@@ -29,7 +29,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
                 ) {
-                    var currentScreen by remember { mutableStateOf(AppScreen.Calculator) }
+                    var currentScreen by rememberSaveable { mutableStateOf(AppScreen.Calculator) }
                     when (currentScreen) {
                         AppScreen.Calculator -> CalculatorScreen(
                             onOpenPhotoSolver = { currentScreen = AppScreen.PhotoSolver }
