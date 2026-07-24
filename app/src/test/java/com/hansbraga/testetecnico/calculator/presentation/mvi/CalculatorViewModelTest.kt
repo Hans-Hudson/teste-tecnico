@@ -3,7 +3,6 @@ package com.hansbraga.testetecnico.calculator.presentation.mvi
 import app.cash.turbine.test
 import com.hansbraga.testetecnico.calculator.data.fake.FakeCalculatorHistoryRepository
 import com.hansbraga.testetecnico.calculator.domain.CalculatorOperation
-import com.hansbraga.testetecnico.calculator.domain.DefaultCalculatorEngine
 import com.hansbraga.testetecnico.calculator.domain.HistoryItem
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -25,7 +24,7 @@ class CalculatorViewModelTest {
     @Before
     fun setUp() {
         Dispatchers.setMain(UnconfinedTestDispatcher())
-        viewModel = CalculatorViewModel(DefaultCalculatorEngine(), fakeRepository)
+        viewModel = CalculatorViewModel(fakeRepository)
     }
 
     @After

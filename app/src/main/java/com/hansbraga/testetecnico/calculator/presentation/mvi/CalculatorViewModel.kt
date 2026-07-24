@@ -2,7 +2,6 @@ package com.hansbraga.testetecnico.calculator.presentation.mvi
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.hansbraga.testetecnico.calculator.domain.CalculatorEngine
 import com.hansbraga.testetecnico.calculator.domain.CalculatorHistoryRepository
 import com.hansbraga.testetecnico.calculator.domain.HistoryItem
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,11 +13,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class CalculatorViewModel(
-    engine: CalculatorEngine,
     private val historyRepository: CalculatorHistoryRepository
 ) : ViewModel() {
 
-    private val reducer = CalculatorReducer(engine)
+    private val reducer = CalculatorReducer()
 
     private val _state = MutableStateFlow(CalculatorState())
     val state: StateFlow<CalculatorState> = _state.asStateFlow()

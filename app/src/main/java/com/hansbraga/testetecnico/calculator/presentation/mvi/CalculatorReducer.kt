@@ -1,6 +1,5 @@
 package com.hansbraga.testetecnico.calculator.presentation.mvi
 
-import com.hansbraga.testetecnico.calculator.domain.CalculatorEngine
 import com.hansbraga.testetecnico.calculator.domain.CalculatorError
 import com.hansbraga.testetecnico.calculator.domain.CalculatorOperation
 import com.hansbraga.testetecnico.calculator.domain.CalculatorResult
@@ -11,7 +10,7 @@ private const val MAX_DISPLAY_LENGTH = 15
  * Reducer puro: (estado atual, intent) -> novo estado.
  * Mantido sem dependência de Android/ViewModel para ser testável isoladamente.
  */
-class CalculatorReducer(private val engine: CalculatorEngine) {
+class CalculatorReducer {
 
     fun reduce(state: CalculatorState, intent: CalculatorIntent.ArithmeticIntent): CalculatorState {
         if (state.isError && intent != CalculatorIntent.ClearPressed) {
@@ -50,7 +49,7 @@ class CalculatorReducer(private val engine: CalculatorEngine) {
         if (state.pendingOperation != null && !state.shouldResetDisplay) {
             val second = state.display.toDouble()
             val first = state.storedOperand ?: second
-            return when (val result = engine.evaluate(first, second, state.pendingOperation)) {
+            return when (val result = evaluate(first, second, state.pendingOperation)) {
                 is CalculatorResult.Success -> state.copy(
                     display = formatOperand(result.value),
                     storedOperand = result.value,
@@ -69,7 +68,7 @@ class CalculatorReducer(private val engine: CalculatorEngine) {
         val operation = state.pendingOperation ?: return state
         val second = state.display.toDouble()
         val first = state.storedOperand ?: second
-        return when (val result = engine.evaluate(first, second, operation)) {
+        return when (val result = evaluate(first, second, operation)) {
             is CalculatorResult.Success -> CalculatorState(
                 display = formatOperand(result.value),
                 shouldResetDisplay = true
@@ -92,6 +91,21 @@ class CalculatorReducer(private val engine: CalculatorEngine) {
             "-${state.display}"
         }
         return state.copy(display = newDisplay)
+    }
+
+    private fun evaluate(first: Double, second: Double, operation: CalculatorOperation): CalculatorResult {
+        return when (operation) {
+            CalculatorOperation.ADD -> CalculatorResult.Success(first + second)
+            CalculatorOperation.SUBTRACT -> CalculatorResult.Success(first - second)
+            CalculatorOperation.MULTIPLY -> CalculatorResult.Success(first * second)
+            CalculatorOperation.DIVIDE -> {
+                if (second == 0.0) {
+                    CalculatorResult.Error(CalculatorError.DIVISION_BY_ZERO)
+                } else {
+                    CalculatorResult.Success(first / second)
+                }
+            }
+        }
     }
 
     private fun errorState(error: CalculatorError): CalculatorState {

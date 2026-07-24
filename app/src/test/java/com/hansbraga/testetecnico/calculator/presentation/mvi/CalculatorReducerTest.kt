@@ -1,23 +1,17 @@
 package com.hansbraga.testetecnico.calculator.presentation.mvi
 
-import com.hansbraga.testetecnico.calculator.domain.CalculatorEngine
-import com.hansbraga.testetecnico.calculator.domain.CalculatorError
 import com.hansbraga.testetecnico.calculator.domain.CalculatorOperation
-import com.hansbraga.testetecnico.calculator.domain.CalculatorResult
-import io.mockk.every
-import io.mockk.mockk
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
 
 class CalculatorReducerTest {
 
-    private val engine: CalculatorEngine = mockk()
     private lateinit var reducer: CalculatorReducer
 
     @Before
     fun setUp() {
-        reducer = CalculatorReducer(engine)
+        reducer = CalculatorReducer()
     }
 
     @Test
@@ -59,9 +53,7 @@ class CalculatorReducerTest {
     }
 
     @Test
-    fun `equals pressed evaluates pending operation using the engine`() {
-        every { engine.evaluate(2.0, 3.0, CalculatorOperation.ADD) } returns CalculatorResult.Success(5.0)
-
+    fun `equals pressed evaluates pending addition`() {
         val state = reducer.reduce(
             CalculatorState(display = "3", storedOperand = 2.0, pendingOperation = CalculatorOperation.ADD),
             CalculatorIntent.EqualsPressed
@@ -72,10 +64,37 @@ class CalculatorReducerTest {
     }
 
     @Test
-    fun `equals pressed with division by zero sets error state`() {
-        every { engine.evaluate(5.0, 0.0, CalculatorOperation.DIVIDE) } returns
-            CalculatorResult.Error(CalculatorError.DIVISION_BY_ZERO)
+    fun `equals pressed evaluates pending subtraction`() {
+        val state = reducer.reduce(
+            CalculatorState(display = "4", storedOperand = 10.0, pendingOperation = CalculatorOperation.SUBTRACT),
+            CalculatorIntent.EqualsPressed
+        )
 
+        assertEquals("6", state.display)
+    }
+
+    @Test
+    fun `equals pressed evaluates pending multiplication`() {
+        val state = reducer.reduce(
+            CalculatorState(display = "4", storedOperand = 3.0, pendingOperation = CalculatorOperation.MULTIPLY),
+            CalculatorIntent.EqualsPressed
+        )
+
+        assertEquals("12", state.display)
+    }
+
+    @Test
+    fun `equals pressed evaluates pending division`() {
+        val state = reducer.reduce(
+            CalculatorState(display = "2", storedOperand = 9.0, pendingOperation = CalculatorOperation.DIVIDE),
+            CalculatorIntent.EqualsPressed
+        )
+
+        assertEquals("4.5", state.display)
+    }
+
+    @Test
+    fun `equals pressed with division by zero sets error state`() {
         val state = reducer.reduce(
             CalculatorState(display = "0", storedOperand = 5.0, pendingOperation = CalculatorOperation.DIVIDE),
             CalculatorIntent.EqualsPressed
@@ -83,6 +102,31 @@ class CalculatorReducerTest {
 
         assertEquals("Erro", state.display)
         assertEquals(true, state.isError)
+    }
+
+    @Test
+    fun `equals pressed with zero divided by zero sets error state`() {
+        val state = reducer.reduce(
+            CalculatorState(display = "0", storedOperand = 0.0, pendingOperation = CalculatorOperation.DIVIDE),
+            CalculatorIntent.EqualsPressed
+        )
+
+        assertEquals("Erro", state.display)
+        assertEquals(true, state.isError)
+    }
+
+    @Test
+    fun `pressing an operation while one is already pending evaluates it first`() {
+        var state = CalculatorState()
+        state = reducer.reduce(state, CalculatorIntent.DigitPressed(2))
+        state = reducer.reduce(state, CalculatorIntent.OperationPressed(CalculatorOperation.ADD))
+        state = reducer.reduce(state, CalculatorIntent.DigitPressed(3))
+
+        state = reducer.reduce(state, CalculatorIntent.OperationPressed(CalculatorOperation.MULTIPLY))
+
+        assertEquals("5", state.display)
+        assertEquals(5.0, state.storedOperand)
+        assertEquals(CalculatorOperation.MULTIPLY, state.pendingOperation)
     }
 
     @Test
