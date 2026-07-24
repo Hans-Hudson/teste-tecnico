@@ -104,17 +104,17 @@ app/src/main/java/.../
 ├── TesteTecnicoApp.kt          # Application, inicializa o Koin
 ├── core/theme/                 # tema Material3 (light/dark)
 ├── calculator/
-│   ├── domain/                 # regras de negócio puras (engine, modelos, repositório como interface)
+│   ├── domain/                 # regras de negócio puras (modelos, repositório como interface)
 │   ├── data/                   # Room (Entity, Dao, Database) e implementação do repositório
 │   ├── presentation/mvi/       # State, Intent, Reducer (puro) e ViewModel
-│   ├── presentation/ui/        # Composables (tela, seção de histórico, testTags)
+│   ├── presentation/ui/        # Composables (tela, seção de histórico, testTags) e ButtonSpec (spec pura dos botões)
 │   └── di/                     # módulo Koin
 └── mathsolver/                 # resolver expressão por foto (OpenAI)
     ├── domain/                 # MathSolverResult, MathSolverRepository (interface)
-    ├── data/                   # DTOs, Retrofit API, implementação do repositório
+    ├── data/                   # DTOs, Retrofit API, implementação do repositório, ImageCapture (captura/compressão de imagem) e interceptor de auth
     ├── presentation/mvi/       # State, Intent e ViewModel
-    ├── presentation/ui/        # Composables (tela, testTags, captura/seleção de imagem)
-    └── di/                     # módulo Koin (Retrofit/OkHttp/Json)
+    ├── presentation/ui/        # Composables (tela, testTags) -- orquestra câmera/galeria e delega captura/compressão ao ImageCapture
+    └── di/                     # módulo Koin (Retrofit/OkHttp/Json/ImageCapture)
 ```
 
 ## Como rodar
@@ -124,9 +124,12 @@ app/src/main/java/.../
 ./gradlew testDebugUnitTest    # roda os testes unitários
 ```
 
-Testes unitários cobrem o reducer MVI (com aritmética real, sem mock), o
-`ViewModel` (com Turbine + um fake repository) e o DAO do Room (com
-Robolectric + banco in-memory, sem precisar de emulador).
+Testes unitários cobrem o `CalculatorReducer` (com aritmética real, sem mock),
+os dois `ViewModel`s (`CalculatorViewModel` e `PhotoSolverViewModel`, com
+Turbine + fake repositories/fake `ImageCapture`) e o DAO do Room (com
+Robolectric + banco in-memory, sem precisar de emulador). `ButtonSpec` e o
+cálculo de escala de imagem (`AndroidImageCapture`) são funções puras
+testadas com JUnit simples, sem Robolectric.
 
 Testes de UI Compose (`androidx.compose.ui.test`) cobrem a `CalculatorScreenContent`
 e a `PhotoSolverScreenContent` (disparo de intents por botão, renderização de
