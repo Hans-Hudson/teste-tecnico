@@ -143,108 +143,21 @@ fun CalculatorScreenContent(
     }
 }
 
-private sealed interface ButtonSpec {
-    data class Digit(val digit: Int) : ButtonSpec
-    data class Operation(val operation: CalculatorOperation) : ButtonSpec
-    data object Decimal : ButtonSpec
-    data object Equals : ButtonSpec
-    data object Clear : ButtonSpec
-    data object ToggleSign : ButtonSpec
-    data object Percent : ButtonSpec
-}
-
 @Composable
 private fun RowScope.CalculatorButton(
     spec: ButtonSpec,
     weight: Float,
     onIntent: (CalculatorIntent) -> Unit
 ) {
-    val (label, description, tag, intent, colors) = when (spec) {
-        is ButtonSpec.Digit -> ButtonPresentation(
-            label = spec.digit.toString(),
-            description = null,
-            tag = CalculatorTestTags.digitButton(spec.digit),
-            intent = CalculatorIntent.DigitPressed(spec.digit),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        )
-
-        is ButtonSpec.Operation -> ButtonPresentation(
-            label = spec.operation.symbol,
-            description = spec.operation.accessibilityLabel,
-            tag = CalculatorTestTags.operationButton(spec.operation),
-            intent = CalculatorIntent.OperationPressed(spec.operation),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary
-            )
-        )
-
-        ButtonSpec.Decimal -> ButtonPresentation(
-            label = ".",
-            description = "Ponto decimal",
-            tag = CalculatorTestTags.DECIMAL_BUTTON,
-            intent = CalculatorIntent.DecimalPointPressed,
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant,
-                contentColor = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        )
-
-        ButtonSpec.Equals -> ButtonPresentation(
-            label = "=",
-            description = "Igual",
-            tag = CalculatorTestTags.EQUALS_BUTTON,
-            intent = CalculatorIntent.EqualsPressed,
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary
-            )
-        )
-
-        ButtonSpec.Clear -> ButtonPresentation(
-            label = "C",
-            description = "Limpar calculadora",
-            tag = CalculatorTestTags.CLEAR_BUTTON,
-            intent = CalculatorIntent.ClearPressed,
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.secondary,
-                contentColor = MaterialTheme.colorScheme.onSecondary
-            )
-        )
-
-        ButtonSpec.ToggleSign -> ButtonPresentation(
-            label = "+/-",
-            description = "Alternar sinal",
-            tag = CalculatorTestTags.TOGGLE_SIGN_BUTTON,
-            intent = CalculatorIntent.ToggleSignPressed,
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.secondary,
-                contentColor = MaterialTheme.colorScheme.onSecondary
-            )
-        )
-
-        ButtonSpec.Percent -> ButtonPresentation(
-            label = "%",
-            description = "Porcentagem",
-            tag = CalculatorTestTags.PERCENT_BUTTON,
-            intent = CalculatorIntent.PercentPressed,
-            colors = ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.secondary,
-                contentColor = MaterialTheme.colorScheme.onSecondary
-            )
-        )
-    }
+    val description = spec.accessibilityDescription()
 
     Button(
-        onClick = { onIntent(intent) },
-        colors = colors,
+        onClick = { onIntent(spec.toIntent()) },
+        colors = spec.role.colors(),
         modifier = Modifier
             .weight(weight)
             .fillMaxHeight()
-            .testTag(tag)
+            .testTag(spec.tag())
             .then(
                 if (description != null) {
                     Modifier.semantics { contentDescription = description }
@@ -253,14 +166,24 @@ private fun RowScope.CalculatorButton(
                 }
             )
     ) {
-        Text(text = label, fontSize = 22.sp)
+        Text(text = spec.label(), fontSize = 22.sp)
     }
 }
 
-private data class ButtonPresentation(
-    val label: String,
-    val description: String?,
-    val tag: String,
-    val intent: CalculatorIntent,
-    val colors: ButtonColors
-)
+@Composable
+private fun ButtonRole.colors(): ButtonColors = when (this) {
+    ButtonRole.NEUTRAL -> ButtonDefaults.buttonColors(
+        containerColor = MaterialTheme.colorScheme.surfaceVariant,
+        contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+    )
+
+    ButtonRole.EMPHASIS -> ButtonDefaults.buttonColors(
+        containerColor = MaterialTheme.colorScheme.primary,
+        contentColor = MaterialTheme.colorScheme.onPrimary
+    )
+
+    ButtonRole.SECONDARY -> ButtonDefaults.buttonColors(
+        containerColor = MaterialTheme.colorScheme.secondary,
+        contentColor = MaterialTheme.colorScheme.onSecondary
+    )
+}
