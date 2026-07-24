@@ -21,6 +21,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.liveRegion
@@ -30,6 +31,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.hansbraga.testetecnico.R
 import com.hansbraga.testetecnico.calculator.domain.CalculatorOperation
 import com.hansbraga.testetecnico.calculator.domain.HistoryItem
 import com.hansbraga.testetecnico.calculator.presentation.mvi.CalculatorIntent
@@ -70,13 +72,14 @@ fun CalculatorScreenContent(
                 .padding(horizontal = 12.dp, vertical = 4.dp),
             horizontalArrangement = Arrangement.End
         ) {
+            val photoSolverButtonDescription = stringResource(R.string.calculator_photo_solver_button_description)
             TextButton(
                 onClick = onOpenPhotoSolver,
                 modifier = Modifier
                     .testTag(CalculatorTestTags.OPEN_PHOTO_SOLVER_BUTTON)
-                    .semantics { contentDescription = "Resolver expressão por foto" }
+                    .semantics { contentDescription = photoSolverButtonDescription }
             ) {
-                Text("Resolver por foto")
+                Text(stringResource(R.string.calculator_photo_solver_button_label))
             }
         }
 
@@ -95,17 +98,18 @@ fun CalculatorScreenContent(
                 .padding(24.dp),
             contentAlignment = Alignment.BottomEnd
         ) {
+            val displayDescription = if (state.isError) {
+                state.display
+            } else {
+                stringResource(R.string.calculator_display_result_description, state.display)
+            }
             Text(
                 text = state.display,
                 modifier = Modifier
                     .testTag(CalculatorTestTags.DISPLAY)
                     .semantics {
                         liveRegion = LiveRegionMode.Polite
-                        contentDescription = if (state.isError) {
-                            state.display
-                        } else {
-                            "Resultado: ${state.display}"
-                        }
+                        contentDescription = displayDescription
                     },
                 fontSize = 56.sp,
                 textAlign = TextAlign.End,
@@ -149,7 +153,7 @@ private fun RowScope.CalculatorButton(
     weight: Float,
     onIntent: (CalculatorIntent) -> Unit
 ) {
-    val description = spec.accessibilityDescription()
+    val description = spec.accessibilityDescriptionRes()?.let { stringResource(it) }
 
     Button(
         onClick = { onIntent(spec.toIntent()) },

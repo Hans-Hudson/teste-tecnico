@@ -1,3 +1,36 @@
 <resources>
     <string name="app_name">Calculadora</string>
+
+    <!-- calculator: tela e histórico -->
+    <string name="calculator_photo_solver_button_description">Resolver expressão por foto</string>
+    <string name="calculator_photo_solver_button_label">Resolver por foto</string>
+    <string name="calculator_display_result_description">Resultado: %1$s</string>
+
+    <string name="calculator_history_title">Histórico</string>
+    <string name="calculator_history_clear_description">Limpar histórico</string>
+    <string name="calculator_history_clear_label">Limpar</string>
+    <string name="calculator_history_item_description">Reutilizar cálculo: %1$s igual a %2$s</string>
+    <string name="calculator_history_item_result">= %1$s</string>
+    <string name="calculator_history_item_delete_description">Apagar cálculo %1$s igual a %2$s do histórico</string>
+
+    <!-- calculator: descrições de acessibilidade dos botões -->
+    <string name="calculator_button_decimal_description">Ponto decimal</string>
+    <string name="calculator_button_equals_description">Igual</string>
+    <string name="calculator_button_clear_description">Limpar calculadora</string>
+    <string name="calculator_button_toggle_sign_description">Alternar sinal</string>
+    <string name="calculator_button_percent_description">Porcentagem</string>
+    <string name="calculator_operation_add_description">Somar</string>
+    <string name="calculator_operation_subtract_description">Subtrair</string>
+    <string name="calculator_operation_multiply_description">Multiplicar</string>
+    <string name="calculator_operation_divide_description">Dividir</string>
+
+    <!-- mathsolver: resolver expressão por foto -->
+    <string name="photo_solver_back_label">Voltar</string>
+    <string name="photo_solver_loading_description">Processando imagem</string>
+    <string name="photo_solver_idle_message">Fotografe ou selecione uma imagem com uma expressão matemática</string>
+    <string name="photo_solver_result_text">%1$s = %2$s</string>
+    <string name="photo_solver_result_description">Resultado: %1$s igual a %2$s</string>
+    <string name="photo_solver_reset_label">Limpar</string>
+    <string name="photo_solver_take_photo_label">Tirar foto</string>
+    <string name="photo_solver_pick_gallery_label">Escolher da galeria</string>
 </resources>

@@ -25,12 +25,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.LiveRegionMode
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.liveRegion
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.hansbraga.testetecnico.R
 import com.hansbraga.testetecnico.mathsolver.presentation.mvi.PhotoSolverIntent
 import com.hansbraga.testetecnico.mathsolver.presentation.mvi.PhotoSolverState
 import com.hansbraga.testetecnico.mathsolver.presentation.mvi.PhotoSolverViewModel
@@ -93,7 +95,7 @@ fun PhotoSolverScreenContent(
                 onClick = onNavigateBack,
                 modifier = Modifier.testTag(PhotoSolverTestTags.BACK_BUTTON)
             ) {
-                Text("Voltar")
+                Text(stringResource(R.string.photo_solver_back_label))
             }
         }
 
@@ -106,21 +108,28 @@ fun PhotoSolverScreenContent(
                 .semantics { liveRegion = LiveRegionMode.Polite }
         ) {
             when (state) {
-                PhotoSolverState.Idle -> Text("Fotografe ou selecione uma imagem com uma expressão matemática")
+                PhotoSolverState.Idle -> Text(stringResource(R.string.photo_solver_idle_message))
 
-                PhotoSolverState.Loading -> CircularProgressIndicator(
-                    modifier = Modifier
-                        .testTag(PhotoSolverTestTags.LOADING_INDICATOR)
-                        .semantics { contentDescription = "Processando imagem" }
-                )
+                PhotoSolverState.Loading -> {
+                    val loadingDescription = stringResource(R.string.photo_solver_loading_description)
+                    CircularProgressIndicator(
+                        modifier = Modifier
+                            .testTag(PhotoSolverTestTags.LOADING_INDICATOR)
+                            .semantics { contentDescription = loadingDescription }
+                    )
+                }
 
-                is PhotoSolverState.Success -> Text(
-                    text = "${state.expression} = ${state.result}",
-                    style = MaterialTheme.typography.headlineSmall,
-                    modifier = Modifier
-                        .testTag(PhotoSolverTestTags.RESULT_TEXT)
-                        .semantics { contentDescription = "Resultado: ${state.expression} igual a ${state.result}" }
-                )
+                is PhotoSolverState.Success -> {
+                    val resultDescription =
+                        stringResource(R.string.photo_solver_result_description, state.expression, state.result)
+                    Text(
+                        text = stringResource(R.string.photo_solver_result_text, state.expression, state.result),
+                        style = MaterialTheme.typography.headlineSmall,
+                        modifier = Modifier
+                            .testTag(PhotoSolverTestTags.RESULT_TEXT)
+                            .semantics { contentDescription = resultDescription }
+                    )
+                }
 
                 is PhotoSolverState.Error -> Text(
                     text = state.message,
@@ -134,7 +143,7 @@ fun PhotoSolverScreenContent(
                     onClick = onReset,
                     modifier = Modifier.testTag(PhotoSolverTestTags.RESET_BUTTON)
                 ) {
-                    Text("Limpar")
+                    Text(stringResource(R.string.photo_solver_reset_label))
                 }
             }
         }
@@ -150,14 +159,14 @@ fun PhotoSolverScreenContent(
                 enabled = actionsEnabled,
                 modifier = Modifier.testTag(PhotoSolverTestTags.TAKE_PHOTO_BUTTON)
             ) {
-                Text("Tirar foto")
+                Text(stringResource(R.string.photo_solver_take_photo_label))
             }
             Button(
                 onClick = onPickFromGallery,
                 enabled = actionsEnabled,
                 modifier = Modifier.testTag(PhotoSolverTestTags.PICK_PHOTO_BUTTON)
             ) {
-                Text("Escolher da galeria")
+                Text(stringResource(R.string.photo_solver_pick_gallery_label))
             }
         }
     }

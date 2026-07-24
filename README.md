@@ -11,10 +11,10 @@ profundidade (arquitetura, testes, acessibilidade, tratamento de erros).
 ## Solução proposta
 
 - **Kotlin + Jetpack Compose**, com arquitetura **MVI**.
-- Lógica de cálculo isolada em uma [`CalculatorEngine`](app/src/main/java/com/hansbraga/testetecnico/calculator/domain/CalculatorEngine.kt)
-  pura (sem dependência de Android), e um [`CalculatorReducer`](app/src/main/java/com/hansbraga/testetecnico/calculator/presentation/mvi/CalculatorReducer.kt)
-  também puro, desacoplado do `ViewModel` — ambos testáveis isoladamente e
-  fáceis de estender com novas tratativas de erro.
+- Lógica de cálculo e transições de estado concentradas no
+  [`CalculatorReducer`](app/src/main/java/com/hansbraga/testetecnico/calculator/presentation/mvi/CalculatorReducer.kt),
+  puro (sem dependência de Android/ViewModel) — testável isoladamente, com
+  cobertura real de todas as operações através do próprio reducer.
 - **Histórico persistente com Room**, exposto como `Flow` reativo através de
   um repositório (`CalculatorHistoryRepository`), mantendo o `ViewModel`
   desacoplado de detalhes do Room.
@@ -27,6 +27,16 @@ profundidade (arquitetura, testes, acessibilidade, tratamento de erros).
   textual claro, display como live region (anuncia resultados/erros
   automaticamente), e elementos do histórico ocultados de forma consistente
   (visual + acessibilidade) quando vazios, sem deslocar o layout.
+- **Strings extraídas para `strings.xml`**: todo texto de interação/acessibilidade
+  usado dentro de composables (`Text`, `contentDescription`) vem de recursos via
+  `stringResource(...)`, preparado para localização. Símbolos matemáticos
+  (`.`, `=`, `C`, `+/-`, `%`, `+ - × ÷`, `✕`) ficam como literais no Kotlin —
+  são universais, não mudam por idioma, e extraí-los não agregaria valor de
+  localização. Para não forçar as funções puras de `ButtonSpec`/`CalculatorOperation`
+  a virarem `@Composable` (o que quebraria a testabilidade com JUnit puro do
+  [`ButtonSpecTest`](app/src/test/java/com/hansbraga/testetecnico/calculator/presentation/ui/ButtonSpecTest.kt)),
+  elas expõem o **id do recurso** (`@StringRes Int`), e só a composable que as
+  consome resolve o texto de fato via `stringResource(id)`.
 - Suporte a light/dark theme (Material 3) e a insets de tela (notch/câmera e
   barra de navegação por gestos) via `enableEdgeToEdge()` + `safeDrawingPadding()`.
   Os papéis de cor (`primary`/`secondary`/`surfaceVariant`/... e seus pares
@@ -114,9 +124,9 @@ app/src/main/java/.../
 ./gradlew testDebugUnitTest    # roda os testes unitários
 ```
 
-Testes unitários cobrem a engine de cálculo, o reducer MVI (com MockK
-isolando a engine), o `ViewModel` (com Turbine + um fake repository) e o DAO
-do Room (com Robolectric + banco in-memory, sem precisar de emulador).
+Testes unitários cobrem o reducer MVI (com aritmética real, sem mock), o
+`ViewModel` (com Turbine + um fake repository) e o DAO do Room (com
+Robolectric + banco in-memory, sem precisar de emulador).
 
 Testes de UI Compose (`androidx.compose.ui.test`) cobrem a `CalculatorScreenContent`
 e a `PhotoSolverScreenContent` (disparo de intents por botão, renderização de
@@ -131,3 +141,23 @@ testado isolando a interface Retrofit com MockK, sem chamadas de rede reais.
 Dois testes travam a altura mínima do display da calculadora (com histórico
 cheio e vazio) sobre uma tela compacta (`w360dp-h640dp`) — reproduziram um
 bug real de layout (display colapsando para 0dp de altura) antes da correção.
+
+## Pendências conhecidas
+
+- **Mensagens de erro ainda hardcoded fora de composables.** As strings de UI
+  dentro de arquivos `@Composable` foram extraídas para `strings.xml`
+  (`stringResource`). Porém quatro mensagens de erro ainda são `String`
+  literais em código que não é `@Composable` — `"Erro"` em
+  [`CalculatorReducer`](app/src/main/java/com/hansbraga/testetecnico/calculator/presentation/mvi/CalculatorReducer.kt),
+  `NOT_FOUND_MESSAGE` em
+  [`PhotoSolverViewModel`](app/src/main/java/com/hansbraga/testetecnico/mathsolver/presentation/mvi/PhotoSolverViewModel.kt),
+  e as duas mensagens de erro em
+  [`MathSolverRepositoryImpl`](app/src/main/java/com/hansbraga/testetecnico/mathsolver/data/MathSolverRepositoryImpl.kt).
+  `stringResource()` só pode ser chamado de dentro de uma composable, e essas
+  três classes são deliberadamente puras/sem Android (reducer testável sem
+  Robolectric, repositório sem depender de `Context`). Resolver isso exige
+  mudar a **forma** do estado — `CalculatorState.display`, `PhotoSolverState.Error`
+  e `MathSolverResult.Error` passariam a carregar um id de recurso (`@StringRes Int`)
+  em vez da `String` já resolvida, com a composable resolvendo o texto na borda —
+  não é uma extração mecânica como a do resto da UI, por isso ficou fora desta
+  rodada.

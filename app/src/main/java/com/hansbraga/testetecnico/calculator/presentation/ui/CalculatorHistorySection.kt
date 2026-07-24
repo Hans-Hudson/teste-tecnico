@@ -18,11 +18,13 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.heading
 import androidx.compose.ui.semantics.hideFromAccessibility
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.dp
+import com.hansbraga.testetecnico.R
 import com.hansbraga.testetecnico.calculator.domain.HistoryItem
 
 @Composable
@@ -48,18 +50,19 @@ fun CalculatorHistorySection(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Histórico",
+                text = stringResource(R.string.calculator_history_title),
                 style = MaterialTheme.typography.labelLarge,
                 modifier = Modifier.semantics { heading() }
             )
+            val clearHistoryDescription = stringResource(R.string.calculator_history_clear_description)
             TextButton(
                 onClick = onClearAll,
                 enabled = !isHistoryEmpty,
                 modifier = Modifier
                     .testTag(CalculatorTestTags.HISTORY_CLEAR_BUTTON)
-                    .semantics { contentDescription = "Limpar histórico" }
+                    .semantics { contentDescription = clearHistoryDescription }
             ) {
-                Text("Limpar")
+                Text(stringResource(R.string.calculator_history_clear_label))
             }
         }
         val listState = rememberLazyListState()
@@ -84,29 +87,29 @@ fun CalculatorHistorySection(
 
 @Composable
 private fun HistoryRow(item: HistoryItem, onSelected: (Long) -> Unit, onDeleted: (Long) -> Unit) {
+    val itemDescription = stringResource(R.string.calculator_history_item_description, item.expression, item.result)
+    val deleteDescription =
+        stringResource(R.string.calculator_history_item_delete_description, item.expression, item.result)
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onSelected(item.id) }
             .testTag(CalculatorTestTags.historyItem(item.id))
-            .semantics {
-                contentDescription = "Reutilizar cálculo: ${item.expression} igual a ${item.result}"
-            }
+            .semantics { contentDescription = itemDescription }
             .padding(horizontal = 12.dp, vertical = 8.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column {
             Text(text = item.expression, style = MaterialTheme.typography.bodySmall)
-            Text(text = "= ${item.result}", style = MaterialTheme.typography.bodyLarge)
+            Text(text = stringResource(R.string.calculator_history_item_result, item.result), style = MaterialTheme.typography.bodyLarge)
         }
         TextButton(
             onClick = { onDeleted(item.id) },
             modifier = Modifier
                 .testTag(CalculatorTestTags.historyItemDelete(item.id))
-                .semantics {
-                    contentDescription = "Apagar cálculo ${item.expression} igual a ${item.result} do histórico"
-                }
+                .semantics { contentDescription = deleteDescription }
         ) {
             Text("✕")
         }

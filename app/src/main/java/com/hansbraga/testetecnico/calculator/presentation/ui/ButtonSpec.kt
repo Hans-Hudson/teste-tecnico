@@ -1,5 +1,7 @@
 package com.hansbraga.testetecnico.calculator.presentation.ui
 
+import androidx.annotation.StringRes
+import com.hansbraga.testetecnico.R
 import com.hansbraga.testetecnico.calculator.domain.CalculatorOperation
 import com.hansbraga.testetecnico.calculator.presentation.mvi.CalculatorIntent
 
@@ -32,14 +34,15 @@ fun ButtonSpec.label(): String = when (this) {
     ButtonSpec.Percent -> "%"
 }
 
-fun ButtonSpec.accessibilityDescription(): String? = when (this) {
+@StringRes
+fun ButtonSpec.accessibilityDescriptionRes(): Int? = when (this) {
     is ButtonSpec.Digit -> null
-    is ButtonSpec.Operation -> operation.accessibilityLabel
-    ButtonSpec.Decimal -> "Ponto decimal"
-    ButtonSpec.Equals -> "Igual"
-    ButtonSpec.Clear -> "Limpar calculadora"
-    ButtonSpec.ToggleSign -> "Alternar sinal"
-    ButtonSpec.Percent -> "Porcentagem"
+    is ButtonSpec.Operation -> operation.accessibilityLabelRes
+    ButtonSpec.Decimal -> R.string.calculator_button_decimal_description
+    ButtonSpec.Equals -> R.string.calculator_button_equals_description
+    ButtonSpec.Clear -> R.string.calculator_button_clear_description
+    ButtonSpec.ToggleSign -> R.string.calculator_button_toggle_sign_description
+    ButtonSpec.Percent -> R.string.calculator_button_percent_description
 }
 
 fun ButtonSpec.tag(): String = when (this) {
