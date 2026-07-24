@@ -1,7 +1,9 @@
 package com.hansbraga.testetecnico.mathsolver.presentation.mvi
 
+import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.hansbraga.testetecnico.mathsolver.data.ImageCapture
 import com.hansbraga.testetecnico.mathsolver.domain.MathSolverRepository
 import com.hansbraga.testetecnico.mathsolver.domain.MathSolverResult
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,7 +14,8 @@ import kotlinx.coroutines.launch
 private const val NOT_FOUND_MESSAGE = "Nenhuma expressão matemática foi encontrada na imagem."
 
 class PhotoSolverViewModel(
-    private val repository: MathSolverRepository
+    private val repository: MathSolverRepository,
+    private val imageCapture: ImageCapture
 ) : ViewModel() {
 
     private val _state = MutableStateFlow<PhotoSolverState>(PhotoSolverState.Idle)
@@ -20,12 +23,15 @@ class PhotoSolverViewModel(
 
     fun onIntent(intent: PhotoSolverIntent) {
         when (intent) {
-            is PhotoSolverIntent.ImageCaptured -> solve(intent.imageBytes)
+            is PhotoSolverIntent.ImageCaptured -> solve(intent.uri)
             PhotoSolverIntent.Reset -> _state.value = PhotoSolverState.Idle
         }
     }
 
-    private fun solve(imageBytes: ByteArray) {
+    fun createCaptureUri(): Uri = imageCapture.createCaptureUri()
+
+    private fun solve(uri: Uri) {
+        val imageBytes = imageCapture.compress(uri) ?: return
         _state.value = PhotoSolverState.Loading
         viewModelScope.launch {
             _state.value = when (val result = repository.solve(imageBytes)) {

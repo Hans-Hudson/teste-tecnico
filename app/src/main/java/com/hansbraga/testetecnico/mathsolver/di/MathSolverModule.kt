@@ -1,6 +1,8 @@
 package com.hansbraga.testetecnico.mathsolver.di
 
 import com.hansbraga.testetecnico.BuildConfig
+import com.hansbraga.testetecnico.mathsolver.data.AndroidImageCapture
+import com.hansbraga.testetecnico.mathsolver.data.ImageCapture
 import com.hansbraga.testetecnico.mathsolver.data.MathSolverApi
 import com.hansbraga.testetecnico.mathsolver.data.MathSolverRepositoryImpl
 import com.hansbraga.testetecnico.mathsolver.domain.MathSolverRepository
@@ -9,6 +11,7 @@ import kotlinx.serialization.json.Json
 import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
+import org.koin.android.ext.koin.androidContext
 import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.module
 import retrofit2.Retrofit
@@ -42,5 +45,7 @@ val mathSolverModule = module {
 
     single<MathSolverRepository> { MathSolverRepositoryImpl(get(), get()) }
 
-    viewModel { PhotoSolverViewModel(get()) }
+    single<ImageCapture> { AndroidImageCapture(androidContext()) }
+
+    viewModel { PhotoSolverViewModel(get(), get()) }
 }
