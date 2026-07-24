@@ -5,10 +5,10 @@ import com.hansbraga.testetecnico.mathsolver.data.AndroidImageCapture
 import com.hansbraga.testetecnico.mathsolver.data.ImageCapture
 import com.hansbraga.testetecnico.mathsolver.data.MathSolverApi
 import com.hansbraga.testetecnico.mathsolver.data.MathSolverRepositoryImpl
+import com.hansbraga.testetecnico.mathsolver.data.openAiAuthInterceptor
 import com.hansbraga.testetecnico.mathsolver.domain.MathSolverRepository
 import com.hansbraga.testetecnico.mathsolver.presentation.mvi.PhotoSolverViewModel
 import kotlinx.serialization.json.Json
-import okhttp3.Interceptor
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import org.koin.android.ext.koin.androidContext
@@ -23,14 +23,8 @@ val mathSolverModule = module {
     single { Json { ignoreUnknownKeys = true } }
 
     single {
-        val authInterceptor = Interceptor { chain ->
-            val request = chain.request().newBuilder()
-                .addHeader("Authorization", "Bearer ${BuildConfig.OPENAI_API_KEY}")
-                .build()
-            chain.proceed(request)
-        }
         OkHttpClient.Builder()
-            .addInterceptor(authInterceptor)
+            .addInterceptor(openAiAuthInterceptor(BuildConfig.OPENAI_API_KEY))
             .build()
     }
 
